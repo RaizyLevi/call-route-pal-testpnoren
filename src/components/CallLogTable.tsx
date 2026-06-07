@@ -34,7 +34,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   );
 }
 
-export function CallLogTable({ data, totalCount }: { data: CallRecord[]; totalCount: number }) {
+export function CallLogTable({ data, totalCount, startIndex = 0 }: { data: CallRecord[]; totalCount: number; startIndex?: number }) {
   const [sort, setSort] = useState<SortState>({ key: "timestamp", dir: "desc" });
 
   const sorted = useMemo(() => {
@@ -121,7 +121,7 @@ export function CallLogTable({ data, totalCount }: { data: CallRecord[]; totalCo
         </table>
       </div>
       <div className="border-t border-border px-4 py-3 text-xs text-muted-foreground bg-muted/20">
-        Showing {sorted.length} of {totalCount} records
+        Showing {startIndex + 1}-{Math.min(startIndex + sorted.length, totalCount)} of {totalCount} records
       </div>
     </div>
   );

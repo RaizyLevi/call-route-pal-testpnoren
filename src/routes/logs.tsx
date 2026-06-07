@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { CalendarIcon, Search, X } from "lucide-react";
@@ -19,6 +19,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
 const mockCalls: CallRecord[] = [
@@ -55,6 +63,8 @@ function LogsPage() {
   const [directionFilter, setDirectionFilter] = useState<string>("all");
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -81,6 +91,16 @@ function LogsPage() {
     });
   }, [search, statusFilter, directionFilter, fromDate, toDate]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, directionFilter, fromDate, toDate, pageSize]);
+
+  const totalFiltered = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
   const hasActiveFilters =
     search || statusFilter !== "all" || directionFilter !== "all" || fromDate || toDate;
 
@@ -91,6 +111,8 @@ function LogsPage() {
     setFromDate(undefined);
     setToDate(undefined);
   };
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <AppLayout>
@@ -223,7 +245,7 @@ function LogsPage() {
         {hasActiveFilters && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">
-              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+              {totalFiltered} result{totalFiltered !== 1 ? "s" : ""}
             </span>
             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto px-2 py-1 text-xs">
               Clear filters
@@ -231,7 +253,62 @@ function LogsPage() {
           </div>
         )}
 
-        <CallLogTable data={filtered} totalCount={mockCalls.length} />
+        <CallLogTable data={paginated} totalCount={totalFiltered} startIndex={startIndex} />
+
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Rows per page</span>
+            <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+              <SelectTrigger className="h-8 w-20 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage((p) => Math.max(1, p - 1));
+                  }}
+                  className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              {pageNumbers.map((n) => (
+                <PaginationItem key={n}>
+                  <PaginationLink
+                    href="#"
+                    isActive={n === safePage}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage(n);
+                    }}
+                  >
+                    {n}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage((p) => Math.min(totalPages, p + 1));
+                  }}
+                  className={safePage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </AppLayout>
   );
