@@ -1,23 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/logs")({
   head: () => ({
     meta: [
-      { title: "Dashboard · Telephonic Waze" },
-      { name: "description", content: "Admin dashboard for the Telephonic Waze voice navigation system." },
+      { title: "Call Logs · Telephonic Waze" },
+      { name: "description", content: "Incoming requests and call history." },
     ],
   }),
-  component: DashboardPage,
+  component: LogsPage,
 });
 
-function DashboardPage() {
+function LogsPage() {
   return (
     <AppLayout>
       <div className="rounded-xl border border-border bg-card p-8 text-card-foreground">
-        <h2 className="text-xl font-semibold">Dashboard</h2>
+        <h2 className="text-xl font-semibold">Call Logs</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          KPIs and metrics will appear here in Phase 2.
+          Requests table will appear here in Phase 2.
         </p>
       </div>
     </AppLayout>
