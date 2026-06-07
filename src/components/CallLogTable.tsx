@@ -121,7 +121,7 @@ export function CallLogTable({ data, totalCount, startIndex = 0 }: { data: CallR
         </table>
       </div>
       <div className="border-t border-border px-4 py-3 text-xs text-muted-foreground bg-muted/20">
-        Showing {sorted.length} of {totalCount} records
+        Showing {startIndex + 1}-{Math.min(startIndex + sorted.length, totalCount)} of {totalCount} records
       </div>
     </div>
   );
