@@ -34,7 +34,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   );
 }
 
-export function CallLogTable({ data, totalCount }: { data: CallRecord[]; totalCount: number }) {
+export function CallLogTable({ data, totalCount, startIndex = 0 }: { data: CallRecord[]; totalCount: number; startIndex?: number }) {
   const [sort, setSort] = useState<SortState>({ key: "timestamp", dir: "desc" });
 
   const sorted = useMemo(() => {
