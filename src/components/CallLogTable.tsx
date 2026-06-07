@@ -121,7 +121,7 @@ export function CallLogTable({ data, totalCount }: { data: CallRecord[]; totalCo
         </table>
       </div>
       <div className="border-t border-border px-4 py-3 text-xs text-muted-foreground bg-muted/20">
-        Showing {sorted.length} of {data.length} records
+        Showing {sorted.length} of {totalCount} records
       </div>
     </div>
   );
