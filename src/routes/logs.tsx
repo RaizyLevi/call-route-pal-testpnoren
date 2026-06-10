@@ -74,6 +74,9 @@ function LogsPage() {
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [exportOpen, setExportOpen] = useState(false);
+  const defaultFilename = `call-logs-${new Date().toISOString().slice(0, 10)}`;
+  const [exportFilename, setExportFilename] = useState(defaultFilename);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
