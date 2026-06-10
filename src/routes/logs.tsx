@@ -135,11 +135,17 @@ function LogsPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold">Call Logs</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Review recent call activity and outcomes.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Call Logs</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Review recent call activity and outcomes.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={exportCsv} disabled={totalFiltered === 0}>
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
