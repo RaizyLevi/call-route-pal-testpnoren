@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Phone, Volume2, Code2, MapPin, Navigation } from "lucide-react";
+import { Loader2, Phone, Volume2, Code2, MapPin, Navigation, Footprints, Bus, Train, Clock, Sparkles } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -173,30 +173,117 @@ function SimulatorPage() {
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2.5">
                 <Volume2 className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-medium">User Experience</h3>
+                <h3 className="text-sm font-medium">LLM &amp; TTS Output</h3>
                 <span className="ml-auto text-xs text-muted-foreground">What the caller hears</span>
               </div>
-              <div className="p-5">
-                <div className="rounded-lg bg-primary/5 border border-primary/20 p-4 text-sm leading-relaxed">
-                  <span className="mb-2 block text-xs font-medium uppercase tracking-wide text-primary">
-                    Voice response
-                  </span>
-                  "{speech}"
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-md bg-muted/50 p-2">
-                    <div className="text-xs text-muted-foreground">Depart</div>
-                    <div className="text-sm font-medium">{plan.departAt}</div>
+
+              <div className="space-y-5 p-5">
+                {/* Intro / summary */}
+                <section>
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                      Summary
+                    </span>
                   </div>
-                  <div className="rounded-md bg-muted/50 p-2">
-                    <div className="text-xs text-muted-foreground">Arrive</div>
-                    <div className="text-sm font-medium">{plan.arriveAt}</div>
+                  <p className="text-sm leading-relaxed text-foreground">
+                    Here's the best way to get from{" "}
+                    <span className="font-medium">{plan.origin}</span> to{" "}
+                    <span className="font-medium">{plan.destination}</span>. It should take about{" "}
+                    <span className="font-medium">{plan.totalDurationMin} minutes</span> in total.
+                  </p>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                {/* Step-by-step instructions */}
+                <section>
+                  <div className="mb-3 flex items-center gap-1.5">
+                    <Navigation className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                      Step-by-step directions
+                    </span>
                   </div>
-                  <div className="rounded-md bg-muted/50 p-2">
-                    <div className="text-xs text-muted-foreground">Total</div>
-                    <div className="text-sm font-medium">{plan.totalDurationMin} min</div>
+                  <ol className="space-y-3">
+                    {plan.legs.map((leg, i) => {
+                      const Icon =
+                        leg.mode === "Walk" ? Footprints : leg.mode === "Bus" ? Bus : Train;
+                      return (
+                        <li key={i} className="flex gap-3">
+                          <div className="flex flex-col items-center">
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                              {i + 1}
+                            </div>
+                            {i < plan.legs.length - 1 && (
+                              <div className="mt-1 w-px flex-1 bg-border" />
+                            )}
+                          </div>
+                          <div className="flex-1 pb-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">
+                                {leg.mode === "Walk"
+                                  ? `Walk ${leg.durationMin} min`
+                                  : `Take ${leg.mode} ${leg.line ?? ""}`.trim()}
+                              </span>
+                              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                                <Clock className="h-3 w-3" />
+                                {leg.durationMin} min
+                              </span>
+                              {leg.stops != null && (
+                                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                                  {leg.stops} stops
+                                </span>
+                              )}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              From <span className="text-foreground/80">{leg.from}</span> to{" "}
+                              <span className="text-foreground/80">{leg.to}</span>
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                {/* Schedule */}
+                <section>
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                      Schedule
+                    </span>
                   </div>
-                </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-md border border-border bg-muted/30 p-2">
+                      <div className="text-[11px] text-muted-foreground">Depart</div>
+                      <div className="text-sm font-semibold">{plan.departAt}</div>
+                    </div>
+                    <div className="rounded-md border border-border bg-muted/30 p-2">
+                      <div className="text-[11px] text-muted-foreground">Arrive</div>
+                      <div className="text-sm font-semibold">{plan.arriveAt}</div>
+                    </div>
+                    <div className="rounded-md border border-primary/30 bg-primary/5 p-2">
+                      <div className="text-[11px] text-muted-foreground">Total</div>
+                      <div className="text-sm font-semibold text-primary">
+                        {plan.totalDurationMin} min
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Raw spoken transcript */}
+                <details className="group rounded-lg border border-border bg-muted/20 open:bg-muted/30">
+                  <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground">
+                    Spoken transcript
+                  </summary>
+                  <p className="border-t border-border px-3 py-3 text-sm italic leading-relaxed text-foreground/80">
+                    "{speech}"
+                  </p>
+                </details>
               </div>
             </div>
           </div>
