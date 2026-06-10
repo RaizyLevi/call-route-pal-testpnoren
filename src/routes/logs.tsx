@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { CalendarIcon, Search, X } from "lucide-react";
+import { CalendarIcon, Download, Search, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { CallLogTable, type CallRecord } from "@/components/CallLogTable";
 import { Input } from "@/components/ui/input";
@@ -114,14 +114,38 @@ function LogsPage() {
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  const exportCsv = () => {
+    const headers = ["Call ID", "Caller", "Direction", "Status", "Duration", "Timestamp", "Result"];
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+    const rows = filtered.map((r) =>
+      [r.id, r.caller, r.direction, r.status, r.duration, r.timestamp, r.result].map(escape).join(",")
+    );
+    const csv = [headers.map(escape).join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `call-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold">Call Logs</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Review recent call activity and outcomes.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Call Logs</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Review recent call activity and outcomes.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={exportCsv} disabled={totalFiltered === 0}>
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
