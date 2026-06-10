@@ -355,6 +355,41 @@ function LogsPage() {
           </Pagination>
         </div>
       </div>
+
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export CSV</DialogTitle>
+            <DialogDescription>
+              Choose a filename for your export. {totalFiltered} record{totalFiltered !== 1 ? "s" : ""} will be included.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="csv-filename">Filename</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="csv-filename"
+                value={exportFilename}
+                onChange={(e) => setExportFilename(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") exportCsv();
+                }}
+                autoFocus
+              />
+              <span className="text-sm text-muted-foreground">.csv</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setExportOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={exportCsv} disabled={!exportFilename.trim()}>
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
