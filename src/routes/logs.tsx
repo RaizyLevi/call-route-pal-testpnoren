@@ -163,7 +163,7 @@ function LogsPage() {
               Review recent call activity and outcomes.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={exportCsv} disabled={totalFiltered === 0}>
+          <Button variant="outline" size="sm" onClick={openExport} disabled={totalFiltered === 0}>
             <Download className="h-4 w-4" />
             Export CSV
           </Button>
