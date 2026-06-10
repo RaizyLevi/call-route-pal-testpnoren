@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Phone, Volume2, Code2, MapPin, Navigation } from "lucide-react";
+import { Loader2, Phone, Volume2, Code2, MapPin, Navigation, Footprints, Bus, Train, Clock, Sparkles } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
