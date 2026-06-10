@@ -114,6 +114,24 @@ function LogsPage() {
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  const exportCsv = () => {
+    const headers = ["Call ID", "Caller", "Direction", "Status", "Duration", "Timestamp", "Result"];
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+    const rows = filtered.map((r) =>
+      [r.id, r.caller, r.direction, r.status, r.duration, r.timestamp, r.result].map(escape).join(",")
+    );
+    const csv = [headers.map(escape).join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `call-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
