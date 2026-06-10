@@ -126,6 +126,11 @@ function LogsPage() {
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  const openExport = () => {
+    setExportFilename(`call-logs-${new Date().toISOString().slice(0, 10)}`);
+    setExportOpen(true);
+  };
+
   const exportCsv = () => {
     const headers = ["Call ID", "Caller", "Direction", "Status", "Duration", "Timestamp", "Result"];
     const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
@@ -136,12 +141,16 @@ function LogsPage() {
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+    const safeName = (exportFilename.trim() || `call-logs-${new Date().toISOString().slice(0, 10)}`)
+      .replace(/[\\/:*?"<>|]/g, "-")
+      .replace(/\.csv$/i, "");
     a.href = url;
-    a.download = `call-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `${safeName}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setExportOpen(false);
   };
 
   return (
