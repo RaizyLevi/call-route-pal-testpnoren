@@ -27,6 +27,15 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 const mockCalls: CallRecord[] = [
@@ -65,6 +74,9 @@ function LogsPage() {
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [exportOpen, setExportOpen] = useState(false);
+  const defaultFilename = `call-logs-${new Date().toISOString().slice(0, 10)}`;
+  const [exportFilename, setExportFilename] = useState(defaultFilename);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -114,6 +126,11 @@ function LogsPage() {
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  const openExport = () => {
+    setExportFilename(`call-logs-${new Date().toISOString().slice(0, 10)}`);
+    setExportOpen(true);
+  };
+
   const exportCsv = () => {
     const headers = ["Call ID", "Caller", "Direction", "Status", "Duration", "Timestamp", "Result"];
     const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
@@ -124,12 +141,16 @@ function LogsPage() {
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+    const safeName = (exportFilename.trim() || `call-logs-${new Date().toISOString().slice(0, 10)}`)
+      .replace(/[\\/:*?"<>|]/g, "-")
+      .replace(/\.csv$/i, "");
     a.href = url;
-    a.download = `call-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `${safeName}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setExportOpen(false);
   };
 
   return (
@@ -142,7 +163,7 @@ function LogsPage() {
               Review recent call activity and outcomes.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={exportCsv} disabled={totalFiltered === 0}>
+          <Button variant="outline" size="sm" onClick={openExport} disabled={totalFiltered === 0}>
             <Download className="h-4 w-4" />
             Export CSV
           </Button>
@@ -334,6 +355,41 @@ function LogsPage() {
           </Pagination>
         </div>
       </div>
+
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export CSV</DialogTitle>
+            <DialogDescription>
+              Choose a filename for your export. {totalFiltered} record{totalFiltered !== 1 ? "s" : ""} will be included.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="csv-filename">Filename</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="csv-filename"
+                value={exportFilename}
+                onChange={(e) => setExportFilename(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") exportCsv();
+                }}
+                autoFocus
+              />
+              <span className="text-sm text-muted-foreground">.csv</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setExportOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={exportCsv} disabled={!exportFilename.trim()}>
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
