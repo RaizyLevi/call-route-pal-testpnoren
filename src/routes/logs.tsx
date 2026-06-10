@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { CalendarIcon, Search, X } from "lucide-react";
+import { CalendarIcon, Download, Search, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { CallLogTable, type CallRecord } from "@/components/CallLogTable";
 import { Input } from "@/components/ui/input";
