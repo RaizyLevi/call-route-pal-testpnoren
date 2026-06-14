@@ -1,10 +1,33 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Phone, Volume2, Code2, MapPin, Navigation, Footprints, Bus, Train, Clock, Sparkles } from "lucide-react";
+import { Loader2, Phone, Volume2, Code2, MapPin, Navigation, Footprints, Bus, Train, Clock, Sparkles, Terminal, Settings2, User, Bot } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type Scenario = "normal" | "heavy-traffic" | "road-closed" | "rainy" | "rush-hour";
+
+const scenarioLabels: Record<Scenario, string> = {
+  normal: "Normal conditions",
+  "heavy-traffic": "Heavy Traffic",
+  "road-closed": "Road Closed",
+  rainy: "Rainy Weather",
+  "rush-hour": "Rush Hour",
+};
+
+interface TranscriptEntry {
+  speaker: "system" | "user";
+  text: string;
+  time: string;
+}
 
 interface TransitLeg {
   mode: "Walk" | "Bus" | "Train" | "Subway";
