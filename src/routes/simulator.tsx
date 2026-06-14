@@ -103,18 +103,59 @@ function planToSpeech(plan: TransitPlan): string {
 function SimulatorPage() {
   const [origin, setOrigin] = useState("Home");
   const [destination, setDestination] = useState("Downtown Office");
+  const [scenario, setScenario] = useState<Scenario>("normal");
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<TransitPlan | null>(null);
   const [speech, setSpeech] = useState<string>("");
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
+
+  const now = () => {
+    const d = new Date();
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
+
+  const pushTranscript = (entry: Omit<TranscriptEntry, "time">) =>
+    setTranscript((prev) => [...prev, { ...entry, time: now() }]);
 
   const runCall = async () => {
     setLoading(true);
     setPlan(null);
     setSpeech("");
-    await new Promise((res) => setTimeout(res, 2000));
+    setTranscript([]);
+
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    pushTranscript({ speaker: "system", text: "📞 Incoming call accepted." });
+    await wait(500);
+    pushTranscript({ speaker: "system", text: "Hello! Where would you like to go today?" });
+    await wait(700);
+    pushTranscript({ speaker: "user", text: `I'm at ${origin}. I need to get to ${destination}.` });
+    await wait(600);
+    if (scenario !== "normal") {
+      pushTranscript({
+        speaker: "system",
+        text: `Heads up — ${scenarioLabels[scenario].toLowerCase()} detected on your route. Recalculating…`,
+      });
+      await wait(800);
+    } else {
+      pushTranscript({ speaker: "system", text: "Got it. Calculating the fastest route…" });
+      await wait(700);
+    }
+
     const p = generateMockPlan(origin.trim() || "Home", destination.trim() || "Downtown Office");
+    if (scenario === "heavy-traffic" || scenario === "rush-hour") {
+      p.totalDurationMin += 12;
+    }
+    if (scenario === "road-closed") {
+      p.totalDurationMin += 20;
+    }
+    const s = planToSpeech(p);
     setPlan(p);
-    setSpeech(planToSpeech(p));
+    setSpeech(s);
+    pushTranscript({ speaker: "system", text: s });
+    await wait(400);
+    pushTranscript({ speaker: "user", text: "Thanks!" });
+    pushTranscript({ speaker: "system", text: "📴 Call ended." });
     setLoading(false);
   };
 
