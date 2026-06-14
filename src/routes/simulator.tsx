@@ -169,7 +169,26 @@ function SimulatorPage() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6">
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="scenario" className="text-xs font-medium text-muted-foreground">
+              <Settings2 className="mr-1 inline h-3.5 w-3.5" />
+              Advanced Settings — Scenario
+            </Label>
+            <Select value={scenario} onValueChange={(v) => setScenario(v as Scenario)} disabled={loading}>
+              <SelectTrigger id="scenario" className="w-full sm:w-72">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(scenarioLabels) as Scenario[]).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {scenarioLabels[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="origin" className="text-xs font-medium text-muted-foreground">
@@ -199,7 +218,7 @@ function SimulatorPage() {
             </div>
           </div>
 
-          <Button onClick={runCall} disabled={loading} className="mt-4 w-full sm:w-auto">
+          <Button onClick={runCall} disabled={loading} className="w-full sm:w-auto">
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -212,6 +231,51 @@ function SimulatorPage() {
               </>
             )}
           </Button>
+        </div>
+
+        {/* Transcript / log */}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2.5">
+            <Terminal className="h-4 w-4 text-muted-foreground" />
+            <h3 className="text-sm font-medium">Simulation Transcript</h3>
+            <span className="ml-auto text-xs text-muted-foreground">
+              {transcript.length} {transcript.length === 1 ? "entry" : "entries"}
+            </span>
+          </div>
+          <div className="max-h-80 overflow-y-auto bg-muted/10 p-4 font-mono text-xs">
+            {transcript.length === 0 ? (
+              <p className="text-muted-foreground italic">
+                Start a simulation to see the conversation log appear here…
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {transcript.map((t, i) => {
+                  const isUser = t.speaker === "user";
+                  const Icon = isUser ? User : Bot;
+                  return (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-muted-foreground/70 shrink-0">[{t.time}]</span>
+                      <Icon
+                        className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isUser ? "text-warning" : "text-primary"}`}
+                      />
+                      <span
+                        className={`shrink-0 font-semibold ${isUser ? "text-warning" : "text-primary"}`}
+                      >
+                        {isUser ? "USER" : "SYS "}:
+                      </span>
+                      <span className="text-foreground/90 leading-relaxed">{t.text}</span>
+                    </li>
+                  );
+                })}
+                {loading && (
+                  <li className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span className="italic">…</span>
+                  </li>
+                )}
+              </ul>
+            )}
+          </div>
         </div>
 
         {loading && (
