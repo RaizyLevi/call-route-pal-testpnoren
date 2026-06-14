@@ -1,15 +1,19 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, PhoneCall, Mic, Phone } from "lucide-react";
+import { LayoutDashboard, PhoneCall, Mic, Phone, Settings, Moon, Sun } from "lucide-react";
 import type { ReactNode } from "react";
+import { useTheme } from "@/hooks/use-theme";
+import { Button } from "@/components/ui/button";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/logs", label: "Call Logs", icon: PhoneCall },
   { to: "/simulator", label: "IVR Simulator", icon: Mic },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, toggle } = useTheme();
 
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
@@ -49,10 +53,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border bg-card/50 backdrop-blur flex items-center px-6 md:px-8">
+        <header className="h-16 border-b border-border bg-card/50 backdrop-blur flex items-center justify-between px-6 md:px-8">
           <h1 className="text-base font-semibold">
             {nav.find((n) => n.to === pathname)?.label ?? "Telephonic Waze"}
           </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
         </header>
         <main className="flex-1 p-6 md:p-8">{children}</main>
       </div>
