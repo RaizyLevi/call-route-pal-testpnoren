@@ -165,8 +165,7 @@ function SimulatorPage() {
         <div>
           <h2 className="text-xl font-semibold">IVR Simulator</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Live test against{" "}
-            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{API_ENDPOINT}</code>
+            Local mock simulation — no network requests
           </p>
         </div>
 
