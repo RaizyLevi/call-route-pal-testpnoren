@@ -57,7 +57,8 @@ function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
 
-const API_ENDPOINT = "https://app-gy36.onrender.com/api/get-route";
+const MOCK_RESPONSE =
+  "id_list_message=t-כדי להגיע ליעד, גשו לתחנת רבי עקיבא וקחו את קו 402. נסיעה טובה!";
 
 interface ParsedIvr {
   key: string | null;
