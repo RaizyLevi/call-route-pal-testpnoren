@@ -156,7 +156,7 @@ function SimulatorPage() {
     pushTranscript({ speaker: "system", text: "Simulating local IVR response…" });
     await wait(800);
 
-    const raw = MOCK_RESPONSE;
+    const raw = getRandomMockResponse();
     setRequestUrl("(local mock)");
     setRawResponse(raw);
     const p = parseIvrResponse(raw);
