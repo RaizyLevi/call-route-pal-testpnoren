@@ -143,32 +143,20 @@ function SimulatorPage() {
     }
     pushTranscript({ speaker: "system", text: "Calling live routing API…" });
 
-    const url = `${API_ENDPOINT}?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(
-      destination,
-    )}`;
-    setRequestUrl(url);
+    pushTranscript({ speaker: "system", text: "Simulating local IVR response…" });
+    await wait(800);
 
-    try {
-      const res = await fetch(url);
-      const raw = await res.text();
-      setRawResponse(raw);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status} — ${raw.slice(0, 200) || res.statusText}`);
-      }
-      const p = parseIvrResponse(raw);
-      setParsed(p);
-      pushTranscript({
-        speaker: "system",
-        text: p.text || "(empty response)",
-      });
-      pushTranscript({ speaker: "system", text: "📴 Call ended." });
-    } catch (e: any) {
-      const msg = e?.message ?? "Request failed";
-      setError(msg);
-      pushTranscript({ speaker: "system", text: `❌ ${msg}` });
-    } finally {
-      setLoading(false);
-    }
+    const raw = MOCK_RESPONSE;
+    setRequestUrl("(local mock)");
+    setRawResponse(raw);
+    const p = parseIvrResponse(raw);
+    setParsed(p);
+    pushTranscript({
+      speaker: "system",
+      text: p.text || "(empty response)",
+    });
+    pushTranscript({ speaker: "system", text: "📴 Call ended." });
+    setLoading(false);
   };
 
   return (
